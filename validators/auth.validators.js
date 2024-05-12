@@ -22,7 +22,6 @@ const userRegisterValidator = Joi.object({
         subjects: Joi.array().items(Joi.string().trim().required()),
         school: Joi.string().trim().required(),
         rollNumber: Joi.string().trim().required(),
-        
       });
 
 // user login validator

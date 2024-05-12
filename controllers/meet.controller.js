@@ -1,15 +1,15 @@
-import { generateResponse, asyncHandler } from '../utils/helpers.js';
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
-import { authenticate } from '@google-cloud/local-auth';
-import { auth } from 'google-auth-library';
-import { SpacesServiceClient } from '@google-apps/meet';
-import { timeStamp } from 'console';
+import { generateResponse, asyncHandler } from "../utils/helpers.js";
+import fs from "fs";
+import path from "path";
+import process from "process";
+import { authenticate } from "@google-cloud/local-auth";
+import { auth } from "google-auth-library";
+import { SpacesServiceClient, } from "@google-apps/meet";
+import { createSessionRequest } from "../models/request.model.js";
 
-const SCOPES = ['https://www.googleapis.com/auth/meetings.space.created'];
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
+const SCOPES = ["https://www.googleapis.com/auth/meetings.space.created"];
+const TOKEN_PATH = path.join(process.cwd(), "token.json");
+const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
 
 // Function to load saved credentials if they exist
 async function loadSavedCredentialsIfExist() {
@@ -29,7 +29,8 @@ async function saveCredentials(client) {
     const keys = JSON.parse(content);
     const key = keys.installed || keys.web;
     const payload = JSON.stringify({
-        type: 'authorized_user',
+
+        type: "authorized_user",
         client_id: key.client_id,
         client_secret: key.client_secret,
         refresh_token: client.credentials.refresh_token,
@@ -40,8 +41,10 @@ async function saveCredentials(client) {
 // Function to authorize the client
 async function authorize() {
     let client = await loadSavedCredentialsIfExist();
+    
     if (!client) {
         client = await authenticate({
+            
             scopes: SCOPES,
             keyfilePath: CREDENTIALS_PATH,
         });
@@ -53,17 +56,29 @@ async function authorize() {
 }
 
 export const createSession = asyncHandler(async (req, res, next) => {
-    try {
-        const authClient = await authorize();
-        const meetClient = new SpacesServiceClient({
-            authClient: authClient,
-        });
-        const response = await meetClient.createSpace();
-        console.log(response);
-        generateResponse(null, 'Session created successfully', res);
-    } catch (error) {
-        console.error(error);
-        generateResponse(error, 'Error creating session', res);
-    }
+    const authClient = await authorize();
+    
+    const meetClient = new SpacesServiceClient({
+        authClient: authClient,
+        
+    });
+    const response =  await meetClient.createSpace({
+        space:{
+          config:{
+            accessType:"OPEN"
+          },
+        }
+    })
+
+    if(!response) return next({
+        statusCode: STATUS_CODES.BAD_REQUEST,
+        message: 'Cannot create session try again'
+    })
+
+    req.body.meetUrl = response[0].meetingUri;
+    
+    // const data = await createSessionRequest({...req.body,})
+
+    generateResponse(response, "Session created successfully", res);
 });
 

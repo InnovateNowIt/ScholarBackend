@@ -15,11 +15,13 @@ const userSchema = new Schema({
     profileImage: { type: String },
     status: { type: String, enum: ["online", "busy",'offline'], default: "online" },
     rollNumber: { type: String },
-    class: [{ type: Schema.Types.ObjectId, ref: "class" }],
+    class: [{type:Number}],
     subjects: [{ type: Schema.Types.ObjectId, ref: "subject" }],
-    role: { type: String, enum: Object.values(ROLES), default: "user" },
+    role: { type: String, enum: Object.values(ROLES), default: "student" },
     refeshToken: { type: String, select: false },
     fcmToken: { type: String,  select: false },
+    otp:{type:Number,select:false},
+    otpExpiry:{type:Date,select:false},
     
 }, { timestamps: true, versionKey: false });
 

@@ -86,13 +86,15 @@ export const otpVerify = asyncHandler(async (req, res, next) => {
     // create user in db
   let {email, otp} = req.body;
 
-    const user = await findUser({ email });
+    const user = await findUser({ email }).select('+otp +otpExpiry');
 
     if(!user) return next({
         statusCode: STATUS_CODES.BAD_REQUEST,
         message: 'user doest exist'
     });
 
+    console.log(user.otp);
+    console.log(otp);
     if(parseInt(user.otp) !== parseInt(otp)) return next({
         statusCode: STATUS_CODES.BAD_REQUEST,
         message: 'Invalid OTP'
@@ -118,7 +120,7 @@ export const otpVerify = asyncHandler(async (req, res, next) => {
 
 export const resetPassword = asyncHandler(async (req, res, next) => {
     // create user in db
-  let {password} = req.body;
+  let {newPassword} = req.body;
     
     const user = await findUser({ email:req.user.email, });
 
@@ -127,7 +129,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
         message: 'Invalid email'
     });
     
-    user.password = password;
+    user.password = newPassword;
 
     await user.save();
     

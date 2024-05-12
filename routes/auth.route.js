@@ -16,7 +16,7 @@ export default class AuthAPI {
         this.router.post('/login', loginValidation, login);
         this.router.post('/forget',  otpGenerate);
         this.router.put('/verify-otp',  otpVerify);
-        this.router.post('/reset-password',authMiddleware(Object.values(ROLES)),  resetPassword);
+        this.router.put('/reset-password',authMiddleware(Object.values(ROLES)),  resetPassword);
         this.router.post('/logout',authMiddleware(Object.values(ROLES)),logout)
         this.router.get('/user',authMiddleware(Object.values(ROLES)),getCurrentUser)
     }

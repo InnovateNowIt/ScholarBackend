@@ -1,11 +1,10 @@
 import { findUser, getAllUsers } from "../models/index.js";
 import { createSessionRequest, fetchOneSessionRequest, fetchSessionRequest } from "../models/request.model.js";
-import { ROLES } from "../utils/constants.js";
+
 import { asyncHandler, generateResponse } from '../utils/helpers.js';
 
 // get all users
 export const fetchAllUsers = asyncHandler(async (req, res, next) => {
-
 
     const page = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
@@ -41,6 +40,7 @@ export const requestSessionOneOnOne = asyncHandler(async (req, res, next) => {
         message: 'Teacher is not active',
         statusCode: 400,
     });
+
     req.body.student = req.user.id;
     
     const createRequest = await createSessionRequest(req.body)
@@ -59,7 +59,7 @@ export const rejectSession = asyncHandler(async (req, res, next) => {
 
     const findSession = await fetchOneSessionRequest({_id:req.body.sessionId});
 
-    if(findSession) return next({
+    if(!findSession) return next({
         message: 'Session not found',
         statusCode: 400,
     });
@@ -74,12 +74,21 @@ export const rejectSession = asyncHandler(async (req, res, next) => {
 export const acceptSession = asyncHandler(async (req, res, next) => {
     
         const findSession = await fetchOneSessionRequest({_id:req.body.sessionId});
-    
-        if(findSession) return next({
+
+        if(!findSession) return next({
             message: 'Session not found',
             statusCode: 400,
         });
+
         findSession.status = 'accepted';
         await findSession.save();            
         generateResponse(findSession, 'Session accepted successfully', res);
+    })
+
+    export const sessionRequests = asyncHandler(async (req, res, next) => {
+        const page = +(req.query.page || 1);
+        const limit = +(req.query.limit || 10);
+        const query = { status: 'pending', teacher: req.user.id };
+        const response = await fetchSessionRequest({page,limit,query});
+        generateResponse(response, 'Session requests fetched successfully', res);
     })

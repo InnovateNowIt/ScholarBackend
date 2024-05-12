@@ -10,10 +10,10 @@ const meetSessionSchema = new mongoose.Schema({
         ref: 'class',
     },
     startTime: {
-        type: Date,
+        type: String,
     },
     endTime: {
-        type: Date,
+        type: String,
     },
     isActive: {
         type: Boolean,
