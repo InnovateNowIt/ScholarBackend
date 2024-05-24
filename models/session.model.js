@@ -6,8 +6,7 @@ const meetSessionSchema = new mongoose.Schema({
         ref: 'user',
     },
     class: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'class',
+        type:Number
     },
     startTime: {
         type: String,
@@ -31,6 +30,9 @@ const meetSessionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user',
     },
+    meetUri:{
+        type:String
+    }
 });
 // https://www.googleapis.com/auth/meetings.space.created
 const MeetSession = mongoose.model('MeetSession', meetSessionSchema);

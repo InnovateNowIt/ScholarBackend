@@ -13,8 +13,8 @@ const userIdPathValidator = Joi.object({
 
 const requestOneOnOneValidator = Joi.object({
     teacher: Joi.string().required(),
-    startTime: Joi.date().required(),
-    endTime: Joi.date().required(),
+    startTime: Joi.string().required(),
+    endTime: Joi.string().required(),
 
 });
 export const requestOneOnOneValidation = validateRequest(requestOneOnOneValidator);

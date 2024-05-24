@@ -13,10 +13,10 @@ const sessionRequestSchema = new mongoose.Schema({
         ref: 'user',
     },
     startTime: {
-        type: Date,
+        type: String,
     },
     endTime: {
-        type: Date,
+        type: String,
     },
     status: {
         type: String,
@@ -27,10 +27,6 @@ const sessionRequestSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    meetUrl:{
-        type: String
-    }
-
 },{timestamps: true, versionKey: false});
 
 sessionRequestSchema.plugin(mongoosePaginate);

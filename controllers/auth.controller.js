@@ -153,3 +153,28 @@ export const getCurrentUser = asyncHandler(async(req,res,next) => {
 
     generateResponse( user , "User found sucessfully", res);
 })
+
+export const changePassword = asyncHandler(async(req,res,next) => {
+    
+        let {oldPassword, newPassword} = req.body;
+    
+        const user = await findUser({ _id:req.user.id, });
+    
+        if(!user) return next({
+            statusCode: STATUS_CODES.BAD_REQUEST,
+            message: 'Invalid email'
+        });
+    
+        const isMatch = await user.isPasswordCorrect(oldPassword);
+    
+        if (!isMatch) return next({
+            statusCode: STATUS_CODES.UNAUTHORIZED,
+            message: 'Invalid password'
+        });
+    
+        user.password = newPassword;
+    
+        await user.save();
+        
+        generateResponse( null , "Password changed sucessfully", res);
+    }   )

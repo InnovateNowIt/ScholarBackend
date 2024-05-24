@@ -6,6 +6,7 @@ import { authenticate } from "@google-cloud/local-auth";
 import { auth } from "google-auth-library";
 import { SpacesServiceClient, } from "@google-apps/meet";
 import { createSessionRequest } from "../models/request.model.js";
+import { findMeetSession } from "../models/session.model.js";
 
 const SCOPES = ["https://www.googleapis.com/auth/meetings.space.created"];
 const TOKEN_PATH = path.join(process.cwd(), "token.json");
@@ -75,10 +76,22 @@ export const createSession = asyncHandler(async (req, res, next) => {
         message: 'Cannot create session try again'
     })
 
-    req.body.meetUrl = response[0].meetingUri;
-    
+    // req.body.meetUrl = response[0].meetingUri;
     // const data = await createSessionRequest({...req.body,})
-
-    generateResponse(response, "Session created successfully", res);
+    return response[0].meetingUri;
 });
 
+export const findMeetSessions = asyncHandler(async (req, res, next) => {
+    const teacher = req.query.teacher || false;
+    const student = req.query.student || false;
+    const query = {}
+
+    if(teacher){
+        query.teacher = req.user.id
+    }
+    if(student){
+        query.student = req.user.id
+    }
+    const data = await findMeetSession(query)
+    generateResponse(data, 'Meet session fetched successfully', res);
+})
